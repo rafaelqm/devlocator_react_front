@@ -22,3 +22,7 @@ input,
 button {
   font-family: Roboto, sans-serif;
 }
+
+.text-right {
+  text-align: right;
+}
