@@ -7,9 +7,20 @@ import "./Main.css";
 
 import DevItem from "./components/DevItem";
 import DevForm from "./components/DevForm";
+import { CustomDialog } from "./components/CustomDialog";
 
 function App() {
   const [devs, setDevs] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [githubDeleting, setGithubDeleting] = useState("");
+
+  const handleDialogOpen = () => {
+    setIsOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setIsOpen(false);
+  };
 
   useEffect(() => {
     async function loadDevs() {
@@ -23,10 +34,29 @@ function App() {
 
   async function handleAddDev(data) {
     const response = await api.post("/devs", data);
-
-    console.log(response.data.created);
-    setDevs([...devs, response.data.created]);
+    console.log(response.data);
+    setDevs([...devs, response.data.dev]);
   }
+
+  async function confirmRemoveDev(github_username) {
+    const response = await api.delete("/devs/" + github_username);
+
+    if (response.status !== 200) {
+      return false;
+    }
+
+    setDevs(devs.filter((dev) => dev.github_username !== github_username));
+  }
+
+  function handleRemoveDev(github_username) {
+    setGithubDeleting(github_username);
+    handleDialogOpen();
+  }
+
+  const handleTestConfirm = () => {
+    confirmRemoveDev(githubDeleting);
+    handleDialogClose();
+  };
 
   // @TODO remover e editar
 
@@ -37,9 +67,15 @@ function App() {
         <DevForm onSubmit={handleAddDev} />
       </aside>
       <main>
+        <CustomDialog
+          isOpen={isOpen}
+          handleClose={handleDialogClose}
+          handleConfirm={handleTestConfirm}
+          title={"Remover usuário " + githubDeleting + "?"}
+        ></CustomDialog>
         <ul>
           {devs.map((dev) => (
-            <DevItem key={dev._id} dev={dev} />
+            <DevItem key={dev._id} handleRemove={handleRemoveDev} dev={dev} />
           ))}
         </ul>
       </main>
