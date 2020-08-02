@@ -35,6 +35,14 @@ function App() {
   async function handleAddDev(data) {
     const response = await api.post("/devs", data);
     console.log(response.data);
+    let exists = devs.filter(
+      (dev) => dev.github_username === response.data.dev.github_username
+    );
+    console.log(exists);
+
+    if (exists.length) {
+      return false;
+    }
     setDevs([...devs, response.data.dev]);
   }
 
