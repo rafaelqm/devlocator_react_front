@@ -38,7 +38,6 @@ function App() {
     let exists = devs.filter(
       (dev) => dev.github_username === response.data.dev.github_username
     );
-    console.log(exists);
 
     if (exists.length) {
       return false;
